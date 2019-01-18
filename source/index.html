@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Snake Game</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+    <h1 style="text-align: center;">Snake Game in VanillaJS</h1>
+    <input type="checkbox" id="eat" />
+    <canvas width="500" height="500" id="canvas" style="padding: 0; margin:auto; display:block; background-color: black;"/>
+    <script>
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext("2d");
+    var snakeSize = 10;
+    var didEat = false;
+    console.log(didEat);
+    var isUp = false;
+    var isDown = true;
+    var isLeft = false;
+    var isRight = false;
+    
+    var snake = [
+        {x: 100, y:100},        
+        {x: 100, y:110},
+        {x: 100, y:120},
+        {x: 100, y:130}
+    ];
+    var speedX = 10;
+    var speedY = 0;
+
+    document.addEventListener("keydown", (e) => {
+        e.preventDefault();
+        checkKey(e.key);
+    });
+    init();
+    function init(){
+        setTimeout(() => {
+            
+    didEat = document.getElementById("eat").checked;
+            clearScreen();
+            
+            moveSnake();
+            drawSnake();
+            init();
+        }, 50)
+    }
+
+    function checkKey(keycode){
+        switch(keycode){
+            case 'w':
+                speedX = 0;
+                speedY = -10;
+                break;
+            case 'a':
+                speedX = -10;
+                speedY = 0;
+                break;
+            case 's':
+                speedX = 0;
+                speedY = 10;
+                break;
+            case 'd':
+                speedX = 10;
+                speedY = 0;
+                break;
+        }
+    }
+
+    function moveSnake(){
+        //snake.reverse();
+        var tail = snake[0];
+
+        var head = {x: tail.x + speedX, y:tail.y + speedY};
+        snake.unshift(head);
+        if(didEat){
+            
+        }else{
+            snake.pop();       
+        }
+    }
+    
+    function drawSnake(){
+        for(x = 0; x < snake.length; x++){
+            drawSnakeParts(snake[x].x, snake[x].y, snakeSize);
+        }
+    }
+
+    function drawSnakeParts(x, y, size){
+        ctx.strokeStyle = 'white';
+        ctx.strokeRect(x,y,size,size);
+    }
+
+    function clearScreen(){
+        ctx.fillStyle = 'black';
+        ctx.fillRect(0,0,500,500);
+    }
+    </script>
+</body>
+</html>

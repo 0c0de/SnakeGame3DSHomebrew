@@ -45,9 +45,9 @@ INCLUDES	:= $(sort $(dir $(wildcard includes/*/)))
 # --------------------------------------------------------------------------------
 # uncomment these for romfs support
 # --------------------------------------------------------------------------------
-# GRAPHICS	:=	assets/gfx
-# ROMFS		:=	assets
-# GFXBUILD	:=	$(ROMFS)/gfx
+GRAPHICS	:=	assets/gfx
+ROMFS		:=	assets
+GFXBUILD	:=	$(ROMFS)/gfx
 
 APP_TITLE		:=	Your awesome Homebrew $(VERSTRING)
 APP_DESCRIPTION	:=	Some awesome software that does something
@@ -69,7 +69,7 @@ CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++11
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
-LIBS	:= -lm3dia -lcitro2d -lcitro3d -lctru -lpng -lm -lz 
+LIBS	:= -lm3dia -lcitro2d -lcitro3d -lctru -lpng -lm -lz -lmpg123
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
