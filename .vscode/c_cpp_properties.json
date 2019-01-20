@@ -4,9 +4,10 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "C:/devkitPro/portlibs/3ds/include/**",
-                "/opt/devkitpro/portlibs/3ds/include/**",
-                "${workspaceFolder}/source"
+                "C:/devkitPro/portlibs/3ds/includes/**",
+                "/opt/devkitpro/portlibs/3ds/includes/**",
+                "${workspaceFolder}/source",
+                "C:/devkitPro/libctru/include/**"
             ],
             "defines": [
                 "_DEBUG",

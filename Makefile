@@ -49,9 +49,9 @@ GRAPHICS	:=	assets/gfx
 ROMFS		:=	assets
 GFXBUILD	:=	$(ROMFS)/gfx
 
-APP_TITLE		:=	Your awesome Homebrew $(VERSTRING)
-APP_DESCRIPTION	:=	Some awesome software that does something
-APP_AUTHOR		:=	You
+APP_TITLE		:=	Snake Game, Simple
+APP_DESCRIPTION	:=	Classic game included in old nokias
+APP_AUTHOR		:=	BR4IN
 
 #---------------------------------------------------------------------------------
 # options for code generation
