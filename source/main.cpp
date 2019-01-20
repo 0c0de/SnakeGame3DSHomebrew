@@ -187,6 +187,10 @@ int main() {
                 {
                     bgm.stop();
                     dieFX.play();
+                    bool isUp = false;
+                    bool isLeft = false;
+                    bool isRight = true;
+                    bool isDown = false;
                     consoleTop.clear();
                     isDied = true;
                 }

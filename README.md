@@ -11,7 +11,9 @@ What a normal snake game would have:
 - [x] An amazing score system
 - [x] A amazing snake
 - [x] An inmersive experience with 60 fps of power
-- [ ] An amazing background music, chiptune based(I don't know if this works I'll check it this weekend)
+- [x] An amazing background music, chiptune based
+- [x] Super minimalistic menu
+- [x] More FX for pickups and when you die
 
 ## Libraries I used:
 
