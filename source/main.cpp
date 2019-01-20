@@ -5,13 +5,6 @@
 #include <string>
 #include <stdio.h>
 
-    //Neccessary instances
-    m3d::Applet app;
-    m3d::Console consoleTop;
-    m3d::Console consoleBottom;
-    m3d::Screen screen;
-
-
 //Generate random values for X food position taking bottom screen width
 int GenerateRandomFoodXPos(){
     return rand() % 320;   
@@ -22,15 +15,20 @@ int GenerateRandomFoodYPos(){
     return rand() % 240;
 }
 
-void readSavegame(){
+int readSavegame(){
     char buffer[100];
     FILE *saveGameData = fopen("sdmc:/3ds/snake/savegame.dat", "r");
     while(!feof(saveGameData)){
         fread(buffer, sizeof(buffer), 1, saveGameData);
     }
-    std::string s = buffer;
-    consoleTop.printAt(0,0,"Info from file: " + s);
+    int s = (int)buffer;
     fclose(saveGameData);
+    return s;
+}
+
+void writeSaveGame(int scoreToSave){
+    FILE *saveGameData = fopen("sdmc:/3ds/snake/savegame.dat", "w");
+    fwrite(&scoreToSave, sizeof(int), 1, saveGameData);
 }
 
 int main() {
@@ -53,6 +51,12 @@ int main() {
     int speed = 5;
     int posX = speed;
     int posY = 0;
+    int highScore;
+    //Neccessary instances
+    m3d::Applet app;
+    m3d::Console consoleTop;
+    m3d::Console consoleBottom;
+    m3d::Screen screen;
 
     //The vector composed by rectangles, this is the snake
     std::vector <m3d::Rectangle> snakeParts;
@@ -80,16 +84,21 @@ int main() {
     pickFX.setVolume(0.7f);
     dieFX.setVolume(1.0f);
     bgm.play();
-    
+    highScore = readSavegame();
     consoleTop.useScreen(m3d::RenderContext::ScreenTarget::Top);
     // app's main loop
     while(app.isRunning()) { 
         bgm.setVolume(actualVol);
         
-        readSavegame();
         //Exits the homebrew
         if (m3d::Input::buttonPressed(m3d::Input::Button::B)) {
             app.exit();
+        }
+
+        if(m3d::Input::buttonPressed(m3d::Input::Button::Y)){
+            highScore += 5;
+            writeSaveGame(highScore);
+            highScore = readSavegame();
         }
 
         //If it is pressed make a boolean true so game can start
@@ -236,6 +245,7 @@ int main() {
                 screen.drawBottom(food);
             }else{
                 //Simple menu to start the game a typical press a to play
+                consoleTop.printAt(0,0, "Data from file: " + std::to_string(highScore));
                 consoleTop.printAt(23, 9, "Hecho por");
                 consoleTop.printAt(8, 10, "Jose Luis Fernandez Mateo a.k.a 0c0de");
                 consoleTop.printAt(11,15, "Para iniciar el juego pulsa 'a'");
