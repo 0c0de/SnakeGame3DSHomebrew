@@ -15,11 +15,15 @@ int GenerateRandomFoodYPos(){
     return rand() % 240;
 }
 
+void convertToCharString(char[] destination, std::string orig){
+    strcpy(destination, orig.c_str());
+}
+
 int readSavegame(){
     char buffer[100];
     FILE *saveGameData = fopen("sdmc:/3ds/snake/savegame.dat", "r");
     while(!feof(saveGameData)){
-        fread(buffer, sizeof(buffer), 1, saveGameData);
+        fread(buffer, sizeof(char), sizeof(buffer), saveGameData);
     }
     int s = (int)buffer;
     fclose(saveGameData);
@@ -27,8 +31,14 @@ int readSavegame(){
 }
 
 void writeSaveGame(int scoreToSave){
+    std::string highScoreConverted = std::to_string(scoreToSave);
+    char charHighScore[highScoreConverted.size() + 1];
+    convertToCharString(charHighScore, highScoreConverted.c_str());
+    
     FILE *saveGameData = fopen("sdmc:/3ds/snake/savegame.dat", "w");
-    fwrite(&scoreToSave, sizeof(int), 1, saveGameData);
+    fwrite(charHighScore, sizeof(char), sizeof(charHighScore), saveGameData);
+    fclose(saveGameData);
+    
 }
 
 int main() {
@@ -97,7 +107,7 @@ int main() {
 
         if(m3d::Input::buttonPressed(m3d::Input::Button::Y)){
             highScore += 5;
-            writeSaveGame(highScore);
+            writeSaveGame(charHighScore);
             highScore = readSavegame();
         }
 
