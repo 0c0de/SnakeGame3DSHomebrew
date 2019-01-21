@@ -15,26 +15,40 @@ int GenerateRandomFoodYPos(){
     return rand() % 240;
 }
 
+//Convert char by copying data from std::string to char[]
 void convertToCharString(char[] destination, std::string orig){
     strcpy(destination, orig.c_str());
 }
 
-int readSavegame(){
+//Read the file where it's stored the highscore
+int readSaveGame(){
+    //Where data will be stored
     char buffer[100];
+    
+    //Open file in read mode
     FILE *saveGameData = fopen("sdmc:/3ds/snake/savegame.dat", "r");
+    
+    //While not the end of file keep adding to buffer char array
     while(!feof(saveGameData)){
         fread(buffer, sizeof(char), sizeof(buffer), saveGameData);
     }
+    
+    //Save a int the score and close the file
     int s = (int)buffer;
     fclose(saveGameData);
     return s;
 }
 
+//Write highscore to file
 void writeSaveGame(int scoreToSave){
+    //Convert from int to std::string
     std::string highScoreConverted = std::to_string(scoreToSave);
+    
+    //Convert from std::string to char[]
     char charHighScore[highScoreConverted.size() + 1];
     convertToCharString(charHighScore, highScoreConverted.c_str());
     
+    //Save and clode the file
     FILE *saveGameData = fopen("sdmc:/3ds/snake/savegame.dat", "w");
     fwrite(charHighScore, sizeof(char), sizeof(charHighScore), saveGameData);
     fclose(saveGameData);
@@ -53,6 +67,7 @@ int main() {
     bool isLeft = false;
     bool isRight = true;
     bool isDown = false;
+    bool newHighScore = false;
     //bool hasChooseMode = false;
     bool gameStarted = false;
     float actualVol = 0.5f;
@@ -93,9 +108,13 @@ int main() {
     pickFX.loop(false);
     pickFX.setVolume(0.7f);
     dieFX.setVolume(1.0f);
+    dieFx.stop();
     bgm.play();
-    highScore = readSavegame();
+    
+    //Get highscore
+    highScore = readSaveGame();
     consoleTop.useScreen(m3d::RenderContext::ScreenTarget::Top);
+    
     // app's main loop
     while(app.isRunning()) { 
         bgm.setVolume(actualVol);
@@ -146,7 +165,8 @@ int main() {
                 
                 consoleTop.printAt(23, 9, "Hecho por");
                 consoleTop.printAt(8, 10, "Jose Luis Fernandez Mateo a.k.a 0c0de");
-                consoleTop.printAt(20,17, "Puntuacion: " + std::to_string(score));   
+                consoleTop.printAt(20,17, "Puntuacion: " + std::to_string(score)); 
+                
                 //Generate food in case of eat the food
                 if(canGenerateFood){
                     foodPosX = GenerateRandomFoodXPos();
@@ -204,13 +224,14 @@ int main() {
                     isInTop
                 )
                 {
-                    bgm.stop();
-                    dieFX.play();
-                    bool isUp = false;
-                    bool isLeft = false;
-                    bool isRight = true;
-                    bool isDown = false;
                     consoleTop.clear();
+                    
+                    if(score > highScore){
+                        writeSaveGame(score);
+                        highScore = readSaveGame();
+                        newHighScore = true;
+                    }
+                    
                     isDied = true;
                 }
 
@@ -233,6 +254,7 @@ int main() {
                 //If it's in that range then not pops the new rect created so the tail is added
                 //And in case not in the position the last element pops out of the vector
                 if(snakeParts[0].getXPosition() >= foodPosX - 6 && snakeParts[0].getXPosition() <= foodPosX + 6  && snakeParts[0].getYPosition() >= foodPosY - 6 && snakeParts[0].getYPosition() <= foodPosY + 6){
+                    pickFX.stop();
                     pickFX.play();
                     canGenerateFood = true;
                     score++;
@@ -264,13 +286,30 @@ int main() {
             //Here it is some die logic, another super simple death menu and some sounds playing around
             isDied = true;
             gameStarted = false;
-            consoleTop.printAt(13, 14, "Ufff parece que has muerto");
-            consoleTop.printAt(13, 15, "Pulsa 'a' para volver a jugar");
-            consoleTop.printAt(13, 16, "Pulsa 'b' para salir");
+            consoleTop.printAt(13, 10, "Ufff parece que has muerto");
+            consoleTop.printAt(13, 11, "Pulsa 'a' para volver a jugar");
+            consoleTop.printAt(13, 12, "Pulsa 'b' para salir");
+            consoleTop.printAt(20,16, "Puntuacion: " + std::to_string(score));
+            
+            //Set a new text with a sound in case it's new the highscore
+            if(newHighScore){
+                consoleTop.printAt(12,17, "Nueva Maxima Puntuacion: " + std::to_string(highScore) + "!");
+                newHighScore = false;
+            }else{
+                consoleTop.printAt(15,17, "Maxima Puntuacion: " + std::to_string(highScore));
+            }
+            
+            //Resetting some vars
             score = 0;
             posX = speed;
             posY = 0;
             isInTop = false;
+            bgm.stop();
+            dieFX.play();
+            bool isUp = false;
+            bool isLeft = false;
+            bool isRight = true;
+            bool isDown = false;
         }
         
         //Render all shapes, text and more...
