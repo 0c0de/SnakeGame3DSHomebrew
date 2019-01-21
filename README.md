@@ -15,11 +15,16 @@ What a normal snake game would have:
 - [x] Super minimalistic menu
 - [x] More FX for pickups and when you die
 
+## What I'm trying to do:
+- [ ] A highscore system
+- [ ] Bug fixing
+- [ ] You can give me more ideas
+
 ## Libraries I used:
 
 * m3diaLib from [m3diaLib-Team](https://github.com/m3diaLib-Team/m3diaLib-CTR) you should try it if you like to break things
 * Citro2d (included in m3dialib)
 * Citro3d (included in m3dialib)
 * 3ds-mpg123 (for audio things)
-* ctrulib (main C library for 3DS from Smea)
+* ctrulib (main C library for 3DS by Smea)
 * And more things but I don't remember it
