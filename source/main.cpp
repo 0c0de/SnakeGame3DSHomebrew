@@ -89,7 +89,7 @@ int main() {
     //Food and it position
     int foodPosX = GenerateRandomFoodXPos();
     int foodPosY = GenerateRandomFoodYPos();
-    m3d::Rectangle food(foodPosX, foodPosY, 6,6,m3d::Color(255,0,0));
+    m3d::Rectangle food(foodPosX, foodPosY, snakeSize,snakeSize,m3d::Color(255,0,0));
 
     //Init all music and effects
     m3d::Music bgm("romfs:/bgm.mp3");
@@ -172,8 +172,8 @@ int main() {
                     foodPosX = GenerateRandomFoodXPos();
                     foodPosY = GenerateRandomFoodYPos();
                     food.setPosition(foodPosX, foodPosY);
-                    food.setWidth(6);
-                    food.setHeight(6);
+                    food.setWidth(snakeSize);
+                    food.setHeight(snakeSize);
                     food.setColor(m3d::Color(255,0,0));
                     canGenerateFood = false;
                 }
@@ -216,24 +216,7 @@ int main() {
                 }
                 
                 //Checks if it's out of screen or if it's overlaping if true any of this then the snake will die
-                if(
-                    snakeParts[0].getXPosition() > screen.getScreenWidth(m3d::RenderContext::ScreenTarget::Bottom) ||
-                    snakeParts[0].getYPosition() > screen.getScreenHeight() ||
-                    snakeParts[0].getYPosition() <= 0 ||
-                    snakeParts[0].getXPosition() <= 0 || 
-                    isInTop
-                )
-                {
-                    consoleTop.clear();
-                    
-                    if(score > highScore){
-                        writeSaveGame(score);
-                        highScore = readSaveGame();
-                        newHighScore = true;
-                    }
-                    
-                    isDied = true;
-                }
+                
 
                 //Where all magic happens, make a new X and Y position for the head because what this does it's just
                 //generate a new head and remove the tail of snake or pushing to front and poping back
@@ -270,6 +253,24 @@ int main() {
 
                 //Drawing the snake
                 for(int j = 0; j < snakeParts.size(); j++){
+                    if(
+                    snakeParts[j].getXPosition() > screen.getScreenWidth(m3d::RenderContext::ScreenTarget::Bottom) ||
+                    snakeParts[j].getYPosition() > screen.getScreenHeight() ||
+                    snakeParts[j].getYPosition() <= 0 ||
+                    snakeParts[j].getXPosition() <= 0 || 
+                    isInTop
+                    )
+                    {
+                        consoleTop.clear();
+                    
+                    if(score > highScore){
+                        writeSaveGame(score);
+                        highScore = readSaveGame();
+                        newHighScore = true;
+                    }
+                    
+                        isDied = true;
+                    }
                     screen.drawBottom(snakeParts[j]);
                 }
 
