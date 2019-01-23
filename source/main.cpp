@@ -16,27 +16,35 @@ int GenerateRandomFoodYPos(){
 }
 
 //Convert char by copying data from std::string to char[]
-void convertToCharString(char[] destination, std::string orig){
+void convertToCharString(char destination[], std::string orig){
     strcpy(destination, orig.c_str());
 }
 
 //Read the file where it's stored the highscore
 int readSaveGame(){
     //Where data will be stored
-    char buffer[100];
+    char buffer[10];
     
     //Open file in read mode
     FILE *saveGameData = fopen("sdmc:/3ds/snake/savegame.dat", "r");
-    
-    //While not the end of file keep adding to buffer char array
-    while(!feof(saveGameData)){
-        fread(buffer, sizeof(char), sizeof(buffer), saveGameData);
+    if(saveGameData != NULL){
+        //While not the end of file keep adding to buffer char array
+        while(!feof(saveGameData)){
+            fread(buffer, sizeof(buffer), 1, saveGameData);
+        }
+            
+        //Save a int the score and close the file
+        int s;
+        sscanf(buffer, "%d", &s);
+        fclose(saveGameData);
+        return s;
+    }else{
+        buffer[10] = '0';
+        saveGameData = fopen("sdmc:/3ds/snake/savegame.dat", "w");
+        fwrite(buffer, sizeof(buffer), 1, saveGameData);
+        fclose(saveGameData);
+        return 0;
     }
-    
-    //Save a int the score and close the file
-    int s = (int)buffer;
-    fclose(saveGameData);
-    return s;
 }
 
 //Write highscore to file
@@ -50,9 +58,8 @@ void writeSaveGame(int scoreToSave){
     
     //Save and clode the file
     FILE *saveGameData = fopen("sdmc:/3ds/snake/savegame.dat", "w");
-    fwrite(charHighScore, sizeof(char), sizeof(charHighScore), saveGameData);
+    fwrite(charHighScore, sizeof(charHighScore), 1, saveGameData);
     fclose(saveGameData);
-    
 }
 
 int main() {
@@ -91,6 +98,8 @@ int main() {
     int foodPosY = GenerateRandomFoodYPos();
     m3d::Rectangle food(foodPosX, foodPosY, snakeSize,snakeSize,m3d::Color(255,0,0));
 
+    
+
     //Init all music and effects
     m3d::Music bgm("romfs:/bgm.mp3");
     m3d::Music pickFX("romfs:/pickup.mp3");
@@ -104,15 +113,9 @@ int main() {
 
     //Music config stuff
     bgm.loop(true);
-    dieFX.loop(false);
-    pickFX.loop(false);
-    pickFX.setVolume(0.7f);
-    dieFX.setVolume(1.0f);
-    dieFx.stop();
     bgm.play();
     
-    //Get highscore
-    highScore = readSaveGame();
+    //highScore = checkFolder("sdmc:/3ds/data/snake/");
     consoleTop.useScreen(m3d::RenderContext::ScreenTarget::Top);
     
     // app's main loop
@@ -122,12 +125,6 @@ int main() {
         //Exits the homebrew
         if (m3d::Input::buttonPressed(m3d::Input::Button::B)) {
             app.exit();
-        }
-
-        if(m3d::Input::buttonPressed(m3d::Input::Button::Y)){
-            highScore += 5;
-            writeSaveGame(charHighScore);
-            highScore = readSavegame();
         }
 
         //If it is pressed make a boolean true so game can start
@@ -140,9 +137,13 @@ int main() {
                 snakeParts.push_back(snake2);
                 snakeParts.push_back(snake3);
                 snakeParts.push_back(snake4);
-                bgm.play();
+                score = 0;
+                newHighScore = false;
                 isDied = false;
                 gameStarted = true;
+
+                //Get highscore
+                highScore = readSaveGame();
                 consoleTop.clear();
             }
         }
@@ -157,6 +158,7 @@ int main() {
         if (m3d::Input::buttonPressed(m3d::Input::Button::R)) {
             if(actualVol > 0.0f && actualVol < 1.0f){
                 actualVol += 0.1f;
+                
             }
         }
 
@@ -237,8 +239,6 @@ int main() {
                 //If it's in that range then not pops the new rect created so the tail is added
                 //And in case not in the position the last element pops out of the vector
                 if(snakeParts[0].getXPosition() >= foodPosX - 6 && snakeParts[0].getXPosition() <= foodPosX + 6  && snakeParts[0].getYPosition() >= foodPosY - 6 && snakeParts[0].getYPosition() <= foodPosY + 6){
-                    pickFX.stop();
-                    pickFX.play();
                     canGenerateFood = true;
                     score++;
                 }else {
@@ -254,24 +254,29 @@ int main() {
                 //Drawing the snake
                 for(int j = 0; j < snakeParts.size(); j++){
                     if(
-                    snakeParts[j].getXPosition() > screen.getScreenWidth(m3d::RenderContext::ScreenTarget::Bottom) ||
-                    snakeParts[j].getYPosition() > screen.getScreenHeight() ||
-                    snakeParts[j].getYPosition() <= 0 ||
-                    snakeParts[j].getXPosition() <= 0 || 
+                    snakeParts[0].getXPosition() > screen.getScreenWidth(m3d::RenderContext::ScreenTarget::Bottom) ||
+                    snakeParts[0].getYPosition() > screen.getScreenHeight() ||
+                    snakeParts[0].getYPosition() <= 0 ||
+                    snakeParts[0].getXPosition() <= 0 || 
                     isInTop
                     )
                     {
                         consoleTop.clear();
                     
-                    if(score > highScore){
-                        writeSaveGame(score);
-                        highScore = readSaveGame();
-                        newHighScore = true;
-                    }
-                    
+                        if(score > highScore){
+                            writeSaveGame(score);
+                            pickFX.play();
+                            newHighScore = true;
+                        }
+                        
+                        if(!newHighScore){
+                            dieFX.play();
+                        }
                         isDied = true;
+                    
+                    }else{
+                        screen.drawBottom(snakeParts[j]);
                     }
-                    screen.drawBottom(snakeParts[j]);
                 }
 
                 //Drawing the food
@@ -290,23 +295,20 @@ int main() {
             consoleTop.printAt(13, 10, "Ufff parece que has muerto");
             consoleTop.printAt(13, 11, "Pulsa 'a' para volver a jugar");
             consoleTop.printAt(13, 12, "Pulsa 'b' para salir");
-            consoleTop.printAt(20,16, "Puntuacion: " + std::to_string(score));
+            consoleTop.printAt(20,15, "Puntuacion: " + std::to_string(score));
             
             //Set a new text with a sound in case it's new the highscore
             if(newHighScore){
-                consoleTop.printAt(12,17, "Nueva Maxima Puntuacion: " + std::to_string(highScore) + "!");
-                newHighScore = false;
+                consoleTop.printAt(13,17, "Nueva Maxima Puntuacion: " + std::to_string(score) + "!");
             }else{
-                consoleTop.printAt(15,17, "Maxima Puntuacion: " + std::to_string(highScore));
+                consoleTop.printAt(16,17, "Maxima Puntuacion: " + std::to_string(highScore));
             }
             
             //Resetting some vars
-            score = 0;
             posX = speed;
             posY = 0;
             isInTop = false;
-            bgm.stop();
-            dieFX.play();
+            //dieFX.play();
             bool isUp = false;
             bool isLeft = false;
             bool isRight = true;

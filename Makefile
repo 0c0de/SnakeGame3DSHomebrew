@@ -36,7 +36,7 @@ export VERSTRING	:=	v$(VER_MAJOR).$(VER_MINOR).$(VER_PATCH)-$(VER_REVISION)
 #     - icon.png
 #     - <libctru folder>/default_icon.png
 #---------------------------------------------------------------------------------
-TARGET		:=	$(notdir $(CURDIR))
+TARGET		:=	SnakeGame3DSHomebrew
 BUILD		:=	build
 SOURCES		:=	$(sort $(dir $(wildcard source/*/)))
 DATA		:=	data

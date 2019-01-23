@@ -1,0 +1,1 @@
+Copy all contents of zip to 3ds folder, including the snake folder
