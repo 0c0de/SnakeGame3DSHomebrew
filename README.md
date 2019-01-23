@@ -14,9 +14,9 @@ What a normal snake game would have:
 - [x] An amazing background music, chiptune based
 - [x] Super minimalistic menu
 - [x] More FX for pickups and when you die
+- [x] A highscore system
 
 ## What I'm trying to do:
-- [ ] A highscore system
 - [ ] Bug fixing
 - [ ] You can give me more ideas
 
